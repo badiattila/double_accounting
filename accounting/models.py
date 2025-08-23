@@ -83,6 +83,11 @@ class EntryLine(models.Model):
         # Base amount signed for quick aggregation (debits positive, credits negative)
         self.base_amount = self.debit - self.credit
 
+    def save(self, *args, **kwargs):
+        # Ensure base_amount always consistent even if full_clean not called upstream
+        self.base_amount = (self.debit or Decimal("0.00")) - (self.credit or Decimal("0.00"))
+        super().save(*args, **kwargs)
+
 # (Optional) Denormalized balances for fast reports
 class Balance(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)

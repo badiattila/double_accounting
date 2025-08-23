@@ -140,3 +140,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ADMIN_SITE_HEADER = "Ledger Admin"
 ADMIN_SITE_TITLE = "Ledger"
+
+INSTALLED_APPS += ["rest_framework", "drf_spectacular"]
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    # keep your existing authentication/permission config
+}
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Ledger API",
+    "DESCRIPTION": "Double-entry accounting API with AI assist",
+    "VERSION": "1.0.0",
+}

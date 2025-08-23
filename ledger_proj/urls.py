@@ -17,6 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+# Customize the admin site header/title
+admin.site.site_header = "Ledger Admin"
+admin.site.site_title = "Ledger"
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 ]

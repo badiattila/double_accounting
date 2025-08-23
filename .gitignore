@@ -1,0 +1,469 @@
+# ===============================================
+# Asian Noodle Store - Full Stack Applications
+# ===============================================
+
+# Node.js / React / Express Application
+# =====================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.nuxt/
+.vite/
+.cache/
+
+# Runtime data
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+.nyc_output
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# Vite specific
+vite.config.ts.*
+
+# Project specific
+scrape_202*
+server/public
+
+# Inventory Management & Web Scraping
+# ===================================
+# Scraping output directories (timestamped)
+scrape_*/
+scrape_*.tar.gz
+
+# Products directory symlink (points to latest scrape)
+/products
+products
+
+# Product images downloaded during scraping
+**/images/*.jpg
+**/images/*.png
+**/images/*.jpeg
+**/images/*.gif
+**/images/*.webp
+
+# Enhanced CSV data structure files
+**/products.csv
+products_*.csv
+
+# Inventory backup files
+*.csv.backup_*
+*.backup_*
+
+# Temporary CSV files from scraping
+temp_*.csv
+scrape_*.csv
+
+# Inventory update logs and reports
+update_*.log
+inventory_report_*.txt
+stock_changes_*.json
+
+# Python / Django Application
+# ============================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+env.bak/
+venv.bak/
+
+# Django specific
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+.static/
+
+# Testing
+.coverage
+.coverage.*
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+*.cover
+*.py,cover
+.hypothesis/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Database Files
+# ==============
+# Production Databases
+production_db.sqlite3
+production_db.sqlite3-*
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Embedded MariaDB/MySQL
+mysql_data/
+mysql_config/
+*.pid
+*.sock
+*.log
+*.err
+
+# Database backups
+noodlestore_backup_*.sql
+*.sql.backup
+*.db.backup
+
+# Legacy MySQL
+*.sql
+*.mysql
+mysql-data/
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+
+# PostgreSQL
+*.psql
+
+# MongoDB
+*.bson
+
+# Docker & Containerization
+# =========================
+# Docker
+.dockerignore
+docker-compose.override.yml
+.docker/
+.devcontainer/
+
+# Kubernetes
+*.yaml.secret
+*.yml.secret
+
+# IDE & Editor Files
+# ==================
+# VSCode
+.vscode/
+*.code-workspace
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Atom
+.atom/
+
+# Vim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Eclipse
+.metadata
+.project
+.pydevproject
+.settings/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.factorypath
+.buildpath
+.target
+.tern-project
+.texlipse
+.springBeans
+.recommenders/
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# Operating System Files
+# ======================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Temporary & Backup Files
+# ========================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*~
+.tmp/
+.temp/
+temp/
+tmp/
+
+# Archive files
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.rar
+*.7z
+*.bz2
+*.xz
+
+# Security & Sensitive Data
+# =========================
+# API keys and secrets
+.secrets
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+config/secrets.yml
+
+# OpenRouter API key
+.openrouter_key
+OPENROUTER_KEY
+.env.openrouter
+
+# Auth tokens
+.auth
+auth.json
+token.json
+
+# SSL certificates
+*.crt
+*.cert
+*.ca-bundle
+
+# GPG keys
+*.gpg
+*.pgp
+
+# Cloud & Deployment
+# ==================
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Serverless
+.serverless/
+
+# AWS
+.aws-sam/
+
+# Vercel
+.vercel
+
+# Netlify
+.netlify
+
+# Heroku
+.heroku/
+
+# Monitoring & Logs
+# =================
+# Application logs
+logs/
+*.log
+log/
+
+# System logs
+syslog
+kern.log
+
+# Performance monitoring
+.trace
+.prof
+
+# Miscellaneous
+# =============
+# AI Summary Generation
+# =====================
+# OpenRouter API outputs
+ai_summary_files/
+products/ai_summary_files/
+*.md.temp
+ai_summaries/
+deepseek_ai_summaries/
+
+# API response cache
+.api_cache/
+api_responses/
+
+# Generated markdown files
+summary_*.md
+ai_generated_*.md
+
+# Project specific temporary files
+dump_*
+backup_*
+
+# Lock files (keep package-lock.json for Node.js projects)
+*.lock
+!package-lock.json
+!yarn.lock
+!Pipfile.lock
+
+# Generated documentation
+docs/_build/
+site/
+
+# Runtime configuration
+.runtime

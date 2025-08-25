@@ -16,8 +16,11 @@ BASICS = [
     ("5300", "Depreciation", AccountType.EXPENSE, True),
 ]
 
+
 class Command(BaseCommand):
-    def handle(self,*args,**kwargs):
-        for code,name,typ,nd in BASICS:
-            Account.objects.get_or_create(code=code, defaults={"name":name,"type":typ,"normal_debit":nd})
+    def handle(self, *args, **kwargs):
+        for code, name, typ, nd in BASICS:
+            Account.objects.get_or_create(
+                code=code, defaults={"name": name, "type": typ, "normal_debit": nd}
+            )
         self.stdout.write(self.style.SUCCESS("Seeded Chart of Accounts."))

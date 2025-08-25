@@ -8,9 +8,12 @@ from .serializers import AccountSerializer, JournalSerializer
 
 # --- drf-spectacular imports ---
 from drf_spectacular.utils import (
-    extend_schema, extend_schema_view,
-    OpenApiTypes, OpenApiExample
+    extend_schema,
+    extend_schema_view,
+    OpenApiTypes,
+    OpenApiExample,
 )
+
 
 # ======================
 # Accounts (read-only)
@@ -25,7 +28,16 @@ from drf_spectacular.utils import (
         examples=[
             OpenApiExample(
                 "Sample response",
-                value=[{"id": 1, "code": "1000", "name": "Cash", "type": "ASSET", "is_active": True, "normal_debit": True}],
+                value=[
+                    {
+                        "id": 1,
+                        "code": "1000",
+                        "name": "Cash",
+                        "type": "ASSET",
+                        "is_active": True,
+                        "normal_debit": True,
+                    }
+                ],
             )
         ],
     ),
@@ -33,6 +45,7 @@ from drf_spectacular.utils import (
 class AccountViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Account.objects.all().order_by("code")
     serializer_class = AccountSerializer
+
 
 # ======================
 # Journals (create)
@@ -42,21 +55,32 @@ class AccountViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         summary="List journals",
         tags=["Journals"],
         responses={200: JournalSerializer(many=True)},
-        examples=[OpenApiExample("Sample", value=[{"id":1,"name":"GENERAL","description":""}])]
+        examples=[
+            OpenApiExample(
+                "Sample", value=[{"id": 1, "name": "GENERAL", "description": ""}]
+            )
+        ],
     ),
     create=extend_schema(
         summary="Create journal",
         tags=["Journals"],
         request=JournalSerializer,
         responses={201: JournalSerializer},
-        examples=[OpenApiExample("Create", request_only=True, value={"name":"BANK","description":"Bank movements"})]
+        examples=[
+            OpenApiExample(
+                "Create",
+                request_only=True,
+                value={"name": "BANK", "description": "Bank movements"},
+            )
+        ],
     ),
 )
-class JournalViewSet(mixins.ListModelMixin,
-                     mixins.CreateModelMixin,
-                     viewsets.GenericViewSet):
+class JournalViewSet(
+    mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet
+):
     queryset = Journal.objects.all().order_by("name")
     serializer_class = JournalSerializer
+
 
 # ======================
 # Transactions (create)
@@ -66,6 +90,7 @@ class EntryLineIn(serializers.Serializer):
     debit = serializers.DecimalField(max_digits=18, decimal_places=2)
     credit = serializers.DecimalField(max_digits=18, decimal_places=2)
     description = serializers.CharField(allow_blank=True, required=False)
+
 
 class TransactionIn(serializers.Serializer):
     journal = serializers.CharField()
@@ -78,28 +103,33 @@ class TransactionIn(serializers.Serializer):
         lines = []
         for l in validated["lines"]:
             acc = Account.objects.get(code=l["account_code"])
-            lines.append({
-                "account": acc,
-                "debit": l["debit"],
-                "credit": l["credit"],
-                "description": l.get("description", "")
-            })
+            lines.append(
+                {
+                    "account": acc,
+                    "debit": l["debit"],
+                    "credit": l["credit"],
+                    "description": l.get("description", ""),
+                }
+            )
         return create_and_post_transaction(
             journal=j,
             tx_date=validated["tx_date"],
             memo=validated.get("memo", ""),
-            lines=lines
+            lines=lines,
         )
+
 
 class TransactionMinimalOut(serializers.Serializer):
     id = serializers.IntegerField()
     posted = serializers.BooleanField()
     memo = serializers.CharField()
 
+
 class TransactionView(viewsets.ViewSet):
     """
     POST /api/transactions/  -> create & post a transaction
     """
+
     @extend_schema(
         summary="Create & post a transaction",
         description="Creates a balanced journal entry (≥2 lines) and posts it atomically.",
@@ -116,9 +146,19 @@ class TransactionView(viewsets.ViewSet):
                     "tx_date": "2025-08-23",
                     "memo": "Sale",
                     "lines": [
-                        {"account_code": "1000", "debit": "25.00", "credit": "0.00", "description": "Cash in"},
-                        {"account_code": "4000", "debit": "0.00", "credit": "25.00", "description": "Revenue"}
-                    ]
+                        {
+                            "account_code": "1000",
+                            "debit": "25.00",
+                            "credit": "0.00",
+                            "description": "Cash in",
+                        },
+                        {
+                            "account_code": "4000",
+                            "debit": "0.00",
+                            "credit": "25.00",
+                            "description": "Revenue",
+                        },
+                    ],
                 },
             ),
             OpenApiExample(
@@ -132,7 +172,9 @@ class TransactionView(viewsets.ViewSet):
         s = TransactionIn(data=request.data)
         s.is_valid(raise_exception=True)
         tx = s.save()
-        return Response(TransactionMinimalOut(tx.__dict__).data, status=status.HTTP_200_OK)
+        return Response(
+            TransactionMinimalOut(tx.__dict__).data, status=status.HTTP_200_OK
+        )
 
 
 # ======================
@@ -143,9 +185,11 @@ class PredictIn(serializers.Serializer):
     narrative = serializers.CharField(required=False, allow_blank=True)
     amount = serializers.DecimalField(max_digits=18, decimal_places=2)
 
+
 class PredictOut(serializers.Serializer):
     account_code = serializers.CharField()
     confidence = serializers.FloatField()
+
 
 @extend_schema_view(
     create=extend_schema(
@@ -159,7 +203,11 @@ class PredictOut(serializers.Serializer):
             OpenApiExample(
                 "Staples pens",
                 request_only=True,
-                value={"payee": "STAPLES DUBLIN", "narrative": "pens", "amount": "23.45"},
+                value={
+                    "payee": "STAPLES DUBLIN",
+                    "narrative": "pens",
+                    "amount": "23.45",
+                },
             ),
             OpenApiExample(
                 "Predicted office supplies",

@@ -3,6 +3,7 @@ from django.db import transaction as dbtx
 from django.core.exceptions import ValidationError
 from .models import Transaction, EntryLine
 
+
 def create_and_post_transaction(*, journal, tx_date, memo, lines):
     """
     lines = [{"account": acc_obj, "debit": Decimal("10.00"), "credit": Decimal("0.00"), "description": "..."}, ...]

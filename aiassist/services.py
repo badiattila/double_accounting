@@ -4,6 +4,7 @@ from .local_model import LocalCategorizer, MODEL_PATH
 # can remove/create the model file without leaving a stale instance.
 _provider = None
 
+
 def _get_provider():
     global _provider
     if _provider is None:
@@ -18,4 +19,6 @@ def _get_provider():
 
 def predict_account_code(*, payee: str, narrative: str = "", amount=None):
     provider = _get_provider()
-    return provider.predict(payee=payee, narrative=narrative or "", amount=float(amount))
+    return provider.predict(
+        payee=payee, narrative=narrative or "", amount=float(amount)
+    )

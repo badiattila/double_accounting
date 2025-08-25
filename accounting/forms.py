@@ -5,6 +5,7 @@ from django.forms.models import BaseInlineFormSet
 
 from .models import EntryLine, Transaction
 
+
 class EntryLineForm(forms.ModelForm):
     class Meta:
         model = EntryLine
@@ -20,12 +21,14 @@ class EntryLineForm(forms.ModelForm):
             raise ValidationError("A line cannot have both debit and credit > 0.")
         return cleaned
 
+
 class EntryLineInlineFormSet(BaseInlineFormSet):
     """
     Enforces the double-entry invariant at the formset level:
     - At least two non-deleted lines
     - Σ(debits) == Σ(credits)
     """
+
     def clean(self):
         super().clean()
 
@@ -47,4 +50,6 @@ class EntryLineInlineFormSet(BaseInlineFormSet):
         if alive < 2:
             raise ValidationError("A transaction must have at least two lines.")
         if total_deb != total_cred:
-            raise ValidationError(f"Unbalanced: debits {total_deb} != credits {total_cred}.")
+            raise ValidationError(
+                f"Unbalanced: debits {total_deb} != credits {total_cred}."
+            )

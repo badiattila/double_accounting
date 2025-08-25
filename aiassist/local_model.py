@@ -12,6 +12,7 @@ from .providers import Categorizer
 
 MODEL_PATH = Path(os.environ.get("AI_MODEL_PATH", ".model/category.joblib"))
 
+
 class LocalCategorizer(Categorizer):
     def __init__(self):
         if MODEL_PATH.exists():
@@ -19,7 +20,9 @@ class LocalCategorizer(Categorizer):
         else:
             self.model = None
 
-    def predict(self, *, payee: str, narrative: str, amount: float) -> Tuple[str, float]:
+    def predict(
+        self, *, payee: str, narrative: str, amount: float
+    ) -> Tuple[str, float]:
         if not self.model:
             return ("5000", 0.10)  # fallback default to Office Supplies
         X = [[f"{payee} {narrative or ''}", float(amount)]]
@@ -27,14 +30,15 @@ class LocalCategorizer(Categorizer):
         idx = probs.argmax()
         return (self.model.classes_[idx], float(probs[idx]))
 
+
 def train_from_ledger(lines_qs):
     """
     lines_qs: queryset of EntryLine joined with Transaction and Account
     using: payee/narrative from a linked BankTransaction or line.description
     """
     rows = []
-    for l in lines_qs.select_related("account","transaction"):
-        text = (getattr(l, "description", "") or "")
+    for l in lines_qs.select_related("account", "transaction"):
+        text = getattr(l, "description", "") or ""
         amt = float(abs(l.debit or l.credit))
         rows.append((f"{text}", amt, l.account.code))
     if not rows:
@@ -43,12 +47,14 @@ def train_from_ledger(lines_qs):
     amounts = [[r[1]] for r in rows]
     y = [r[2] for r in rows]
 
-    text_vec = HashingVectorizer(n_features=2**15, lowercase=True, ngram_range=(1,2))
+    text_vec = HashingVectorizer(n_features=2**15, lowercase=True, ngram_range=(1, 2))
     amt_bins = KBinsDiscretizer(n_bins=8, encode="onehot-dense", strategy="quantile")
-    ct = ColumnTransformer([
-        ("text", text_vec, 0),
-        ("amt", amt_bins, [1]),
-    ])
+    ct = ColumnTransformer(
+        [
+            ("text", text_vec, 0),
+            ("amt", amt_bins, [1]),
+        ]
+    )
     clf = LogisticRegression(max_iter=200)
     pipe = Pipeline(steps=[("ct", ct), ("clf", clf)])
     X = list(zip(texts, amounts))

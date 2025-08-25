@@ -25,16 +25,23 @@ from accounting.reporting import (
 def _parse_date(s: str) -> date:
     return date.fromisoformat(s)
 
+
 @extend_schema(
     summary="Income Statement (Profit & Loss)",
     parameters=[
         OpenApiParameter(
-            name="from", type=OpenApiTypes.DATE, location=OpenApiParameter.QUERY,
-            required=True, description="Start date inclusive (YYYY-MM-DD)"
+            name="from",
+            type=OpenApiTypes.DATE,
+            location=OpenApiParameter.QUERY,
+            required=True,
+            description="Start date inclusive (YYYY-MM-DD)",
         ),
         OpenApiParameter(
-            name="to", type=OpenApiTypes.DATE, location=OpenApiParameter.QUERY,
-            required=True, description="End date inclusive (YYYY-MM-DD)"
+            name="to",
+            type=OpenApiTypes.DATE,
+            location=OpenApiParameter.QUERY,
+            required=True,
+            description="End date inclusive (YYYY-MM-DD)",
         ),
     ],
     responses={200: None},
@@ -63,8 +70,11 @@ def income_statement_view(request):
     summary="Balance Sheet",
     parameters=[
         OpenApiParameter(
-            name="as_of", type=OpenApiTypes.DATE, location=OpenApiParameter.QUERY,
-            required=True, description="Point-in-time date (YYYY-MM-DD)"
+            name="as_of",
+            type=OpenApiTypes.DATE,
+            location=OpenApiParameter.QUERY,
+            required=True,
+            description="Point-in-time date (YYYY-MM-DD)",
         ),
     ],
     responses={200: None},
@@ -93,16 +103,25 @@ def balance_sheet_view(request):
     description="Provide either `as_of` OR both `from` and `to`.",
     parameters=[
         OpenApiParameter(
-            name="as_of", type=OpenApiTypes.DATE, location=OpenApiParameter.QUERY,
-            required=False, description="Point-in-time date (YYYY-MM-DD)"
+            name="as_of",
+            type=OpenApiTypes.DATE,
+            location=OpenApiParameter.QUERY,
+            required=False,
+            description="Point-in-time date (YYYY-MM-DD)",
         ),
         OpenApiParameter(
-            name="from", type=OpenApiTypes.DATE, location=OpenApiParameter.QUERY,
-            required=False, description="Start date inclusive (YYYY-MM-DD)"
+            name="from",
+            type=OpenApiTypes.DATE,
+            location=OpenApiParameter.QUERY,
+            required=False,
+            description="Start date inclusive (YYYY-MM-DD)",
         ),
         OpenApiParameter(
-            name="to", type=OpenApiTypes.DATE, location=OpenApiParameter.QUERY,
-            required=False, description="End date inclusive (YYYY-MM-DD)"
+            name="to",
+            type=OpenApiTypes.DATE,
+            location=OpenApiParameter.QUERY,
+            required=False,
+            description="End date inclusive (YYYY-MM-DD)",
         ),
     ],
     responses={200: None},

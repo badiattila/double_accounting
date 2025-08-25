@@ -21,23 +21,26 @@ from typing import Dict, Iterable, Tuple
 
 from accounting.models import EntryLine, Account, AccountType
 
+
 @dataclass
 class LineSum:
     account_id: int
     account_code: str
     account_name: str
-    type: str           # AccountType value
+    type: str  # AccountType value
     normal_debit: bool
     amount_base: Decimal  # sum(debit - credit) in base currency (your EntryLine fields)
-    display: Decimal      # amount as humans expect (normal balance logic)
+    display: Decimal  # amount as humans expect (normal balance logic)
+
 
 def _iter_lines(*, start: date | None, end: date) -> Iterable[EntryLine]:
-    qs = (EntryLine.objects
-          .select_related("account", "transaction")
-          .filter(transaction__posted=True, transaction__tx_date__lte=end))
+    qs = EntryLine.objects.select_related("account", "transaction").filter(
+        transaction__posted=True, transaction__tx_date__lte=end
+    )
     if start is not None:
         qs = qs.filter(transaction__tx_date__gte=start)
     return qs
+
 
 def _accumulate(lines: Iterable[EntryLine]) -> Dict[int, LineSum]:
     sums: Dict[int, LineSum] = {}
@@ -62,6 +65,7 @@ def _accumulate(lines: Iterable[EntryLine]) -> Dict[int, LineSum]:
         s.display = s.amount_base if s.normal_debit else -s.amount_base
     return sums
 
+
 def _sum_base(lines: Iterable[EntryLine]) -> Dict[int, Tuple[Account, Decimal]]:
     """
     Sum base amounts (debit - credit) per account, return {account_id: (Account, amount_base)}.
@@ -76,6 +80,7 @@ def _sum_base(lines: Iterable[EntryLine]) -> Dict[int, Tuple[Account, Decimal]]:
         else:
             out[acc.id] = (acc, amt)
     return out
+
 
 # ------------ Income Statement (P&L) ------------
 def income_statement(*, start: date, end: date) -> dict:
@@ -95,7 +100,7 @@ def income_statement(*, start: date, end: date) -> dict:
 
     Important: only posted transactions are considered.
     """
-   
+
     lines = _iter_lines(start=start, end=end)
     sums = _accumulate(lines)
 
@@ -153,9 +158,8 @@ def balance_sheet(*, as_of: date) -> dict:
     # Retained earnings = cumulative net income up to as_of
     inc = [s for s in cumulative.values() if s.type == AccountType.INCOME]
     exp = [s for s in cumulative.values() if s.type == AccountType.EXPENSE]
-    retained = (
-        sum((s.display for s in inc), Decimal("0"))
-        - sum((s.display for s in exp), Decimal("0"))
+    retained = sum((s.display for s in inc), Decimal("0")) - sum(
+        (s.display for s in exp), Decimal("0")
     )
 
     total_assets = sum((s.display for s in assets), Decimal("0"))
@@ -163,7 +167,7 @@ def balance_sheet(*, as_of: date) -> dict:
     total_equity = sum((s.display for s in equity), Decimal("0")) + retained
 
     # Balance check (A = L + E)
-    balance_ok = (total_assets == (total_liabs + total_equity))
+    balance_ok = total_assets == (total_liabs + total_equity)
 
     return {
         "as_of": str(as_of),
@@ -212,12 +216,14 @@ def trial_balance_as_of(*, as_of: date) -> dict:
             credit = +(-base)
             total_credits += credit
 
-        rows.append({
-            "code": acc.code,
-            "name": acc.name,
-            "debit": str(debit),
-            "credit": str(credit),
-        })
+        rows.append(
+            {
+                "code": acc.code,
+                "name": acc.name,
+                "debit": str(debit),
+                "credit": str(credit),
+            }
+        )
 
     return {
         "as_of": str(as_of),
@@ -228,6 +234,7 @@ def trial_balance_as_of(*, as_of: date) -> dict:
             "balanced": (total_debits == total_credits),
         },
     }
+
 
 def trial_balance_period(*, start: date, end: date) -> dict:
     """
@@ -252,12 +259,14 @@ def trial_balance_period(*, start: date, end: date) -> dict:
             credit = +(-base)
             total_credits += credit
 
-        rows.append({
-            "code": acc.code,
-            "name": acc.name,
-            "debit": str(debit),
-            "credit": str(credit),
-        })
+        rows.append(
+            {
+                "code": acc.code,
+                "name": acc.name,
+                "debit": str(debit),
+                "credit": str(credit),
+            }
+        )
 
     return {
         "period": {"start": str(start), "end": str(end)},

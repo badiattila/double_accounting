@@ -5,6 +5,7 @@ import json
 
 DEFAULT_MODEL_PATH = Path(".model/category.joblib")
 
+
 class Command(BaseCommand):
     help = "Inspect the trained categorizer model and print a small health report."
 
@@ -40,7 +41,9 @@ class Command(BaseCommand):
             return
 
         # 2) Basic structure
-        steps = [(name, type(step).__name__) for name, step in getattr(model, "steps", [])]
+        steps = [
+            (name, type(step).__name__) for name, step in getattr(model, "steps", [])
+        ]
         clf = getattr(model, "named_steps", {}).get("clf", None)
 
         self.stdout.write("\n--- Pipeline steps ---")

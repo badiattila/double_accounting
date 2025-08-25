@@ -8,6 +8,7 @@ from .models import Account, Journal, Transaction, EntryLine
 from .forms import EntryLineForm, EntryLineInlineFormSet
 from .services import create_and_post_transaction  # optional for actions
 
+
 # ---------- Account ----------
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
@@ -20,11 +21,13 @@ class AccountAdmin(admin.ModelAdmin):
         (None, {"fields": ("code", "name", "type", "normal_debit", "is_active")}),
     )
 
+
 # ---------- Journal ----------
 @admin.register(Journal)
 class JournalAdmin(admin.ModelAdmin):
     list_display = ("name", "description")
     search_fields = ("name", "description")
+
 
 # ---------- Inline: EntryLine on Transaction ----------
 class EntryLineInline(admin.TabularInline):
@@ -39,12 +42,21 @@ class EntryLineInline(admin.TabularInline):
     classes = ("collapse",)
     show_change_link = False
 
+
 # ---------- Transaction ----------
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
     inlines = [EntryLineInline]
     date_hierarchy = "tx_date"
-    list_display = ("id", "tx_date", "journal", "memo", "posted_badge", "debit_total", "credit_total")
+    list_display = (
+        "id",
+        "tx_date",
+        "journal",
+        "memo",
+        "posted_badge",
+        "debit_total",
+        "credit_total",
+    )
     list_filter = ("posted", "journal")
     search_fields = ("memo", "lines__description", "journal__name")
     autocomplete_fields = ("journal",)
@@ -54,17 +66,24 @@ class TransactionAdmin(admin.ModelAdmin):
     def posted_badge(self, obj):
         color = "#22c55e" if obj.posted else "#ef4444"
         label = "Posted" if obj.posted else "Draft"
-        return format_html('<span style="padding:2px 6px;border-radius:8px;background:{};color:white;">{}</span>', color, label)
+        return format_html(
+            '<span style="padding:2px 6px;border-radius:8px;background:{};color:white;">{}</span>',
+            color,
+            label,
+        )
+
     posted_badge.short_description = "Status"
 
     def debit_total(self, obj):
         q = obj.lines.all()
         return sum((l.debit for l in q), Decimal("0.00"))
+
     debit_total.short_description = "Σ Debit"
 
     def credit_total(self, obj):
         q = obj.lines.all()
         return sum((l.credit for l in q), Decimal("0.00"))
+
     credit_total.short_description = "Σ Credit"
 
     # Prevent edits on posted transactions
@@ -98,13 +117,21 @@ class TransactionAdmin(admin.ModelAdmin):
                     tx.post()
                 count += 1
             except Exception as e:
-                self.message_user(request, f"Tx {tx.pk} not posted: {e}", level=messages.ERROR)
+                self.message_user(
+                    request, f"Tx {tx.pk} not posted: {e}", level=messages.ERROR
+                )
         if count:
-            self.message_user(request, f"Posted {count} transaction(s).", level=messages.SUCCESS)
+            self.message_user(
+                request, f"Posted {count} transaction(s).", level=messages.SUCCESS
+            )
 
     @admin.action(description="Unpost (blocked for safety) — use reversal instead")
     def action_unpost_blocked(self, request, queryset):
-        self.message_user(request, "Unposting is disabled. Create reversing entries instead.", level=messages.WARNING)
+        self.message_user(
+            request,
+            "Unposting is disabled. Create reversing entries instead.",
+            level=messages.WARNING,
+        )
 
     @admin.action(description="Create reversing entry for selected posted transactions")
     def action_reverse_transaction(self, request, queryset):
@@ -112,18 +139,24 @@ class TransactionAdmin(admin.ModelAdmin):
         created = 0
         for tx in queryset:
             if not tx.posted:
-                self.message_user(request, f"Tx {tx.pk} is not posted; skipping.", level=messages.WARNING)
+                self.message_user(
+                    request,
+                    f"Tx {tx.pk} is not posted; skipping.",
+                    level=messages.WARNING,
+                )
                 continue
             try:
                 with dbtx.atomic():
                     lines = []
                     for l in tx.lines.all():
-                        lines.append({
-                            "account": l.account,
-                            "debit": l.credit,   # swap
-                            "credit": l.debit,
-                            "description": f"Reversal of Tx {tx.pk}: {l.description or ''}",
-                        })
+                        lines.append(
+                            {
+                                "account": l.account,
+                                "debit": l.credit,  # swap
+                                "credit": l.debit,
+                                "description": f"Reversal of Tx {tx.pk}: {l.description or ''}",
+                            }
+                        )
                     rev = create_and_post_transaction(
                         journal=tx.journal,
                         tx_date=tx.tx_date,
@@ -132,6 +165,12 @@ class TransactionAdmin(admin.ModelAdmin):
                     )
                     created += 1
             except Exception as e:
-                self.message_user(request, f"Failed reversing Tx {tx.pk}: {e}", level=messages.ERROR)
+                self.message_user(
+                    request, f"Failed reversing Tx {tx.pk}: {e}", level=messages.ERROR
+                )
         if created:
-            self.message_user(request, f"Created {created} reversing transaction(s).", level=messages.SUCCESS)
+            self.message_user(
+                request,
+                f"Created {created} reversing transaction(s).",
+                level=messages.SUCCESS,
+            )

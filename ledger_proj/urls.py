@@ -20,20 +20,16 @@ from rest_framework.routers import DefaultRouter
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from api.views import PredictView  # plus your Transaction/Account viewsets if defined
 
-
 # Customize the admin site header/title
 admin.site.site_header = "Ledger Admin"
 admin.site.site_title = "Ledger"
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-]
-
 router = DefaultRouter()
 router.register(r'predict', PredictView, basename='predict')
 
-urlpatterns += [
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema")),
-    path("api/", include(router.urls)),
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema')),
+    path('api/', include('api.urls')),
 ]

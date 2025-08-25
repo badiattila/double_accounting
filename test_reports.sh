@@ -35,5 +35,14 @@ URL_BS="${HOST%/}/api/reports/balance-sheet/?as_of=${AS_OF_DATE}"
 retry_curl "$URL_BS" || exit 1
 
 echo
+echo "== Trial Balance (as-of ${AS_OF_DATE}) =="
+URL_TB_ASOF="${HOST%/}/api/reports/trial-balance/?as_of=${AS_OF_DATE}"
+retry_curl "$URL_TB_ASOF" || exit 1
+
+echo
+echo "== Trial Balance (period ${FROM_DATE} → ${TO_DATE}) =="
+URL_TB_PERIOD="${HOST%/}/api/reports/trial-balance/?from=${FROM_DATE}&to=${TO_DATE}"
+retry_curl "$URL_TB_PERIOD" || exit 1
+
 echo "Done. Above are the two reports fetched from ${HOST}."
 

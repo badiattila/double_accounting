@@ -117,3 +117,27 @@ class ReportTests(TestCase):
 		self.assertEqual(r.status_code, status.HTTP_200_OK)
 		totals = r.data["totals"]
 		self.assertTrue(totals.get("balanced", False))
+
+
+class TrialBalanceTests(TestCase):
+    def setUp(self):
+        self.j, _ = Journal.objects.get_or_create(name="GENERAL")
+        self.bank = Account.objects.create(code="1100", name="Bank", type=AccountType.ASSET, normal_debit=True)
+        self.sales = Account.objects.create(code="4000", name="Sales", type=AccountType.INCOME, normal_debit=False)
+        create_and_post_transaction(self.j, date(2025,8,10), "Sale 100",
+            [{"account": self.bank, "debit": Decimal("100.00"), "credit":0},
+             {"account": self.sales,"debit":0, "credit": Decimal("100.00")}])
+
+    def test_tb_as_of(self):
+        url = reverse("report-trial-balance") + "?as_of=2025-08-31"
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(r.data["totals"]["balanced"])
+        self.assertEqual(r.data["totals"]["debit"], "100.00")
+        self.assertEqual(r.data["totals"]["credit"], "100.00")
+
+    def test_tb_period(self):
+        url = reverse("report-trial-balance") + "?from=2025-08-01&to=2025-08-31"
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(r.data["totals"]["balanced"])

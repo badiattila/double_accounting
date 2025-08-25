@@ -62,6 +62,21 @@ def _accumulate(lines: Iterable[EntryLine]) -> Dict[int, LineSum]:
         s.display = s.amount_base if s.normal_debit else -s.amount_base
     return sums
 
+def _sum_base(lines: Iterable[EntryLine]) -> Dict[int, Tuple[Account, Decimal]]:
+    """
+    Sum base amounts (debit - credit) per account, return {account_id: (Account, amount_base)}.
+    This is *not* normal-balance adjusted — trial balance uses raw debit/credit sign.
+    """
+    out: Dict[int, Tuple[Account, Decimal]] = {}
+    for l in lines:
+        acc = l.account
+        amt = (l.debit or Decimal("0")) - (l.credit or Decimal("0"))
+        if acc.id in out:
+            out[acc.id] = (acc, out[acc.id][1] + amt)
+        else:
+            out[acc.id] = (acc, amt)
+    return out
+
 # ------------ Income Statement (P&L) ------------
 def income_statement(*, start: date, end: date) -> dict:
     """
@@ -169,5 +184,87 @@ def balance_sheet(*, as_of: date) -> dict:
             "assets": str(+total_assets),
             "liabilities_plus_equity": str(+(total_liabs + total_equity)),
             "balanced": balance_ok,
+        },
+    }
+
+
+# ------------ Trial Balance Reports ------------
+def trial_balance_as_of(*, as_of: date) -> dict:
+    """
+    Classic Trial Balance at a point in time:
+    - Cumulative sums up to 'as_of'
+    - Each account shows either a Debit or Credit balance (never both)
+    """
+    sums = _sum_base(_iter_lines(start=None, end=as_of))
+    rows = []
+    total_debits = Decimal("0")
+    total_credits = Decimal("0")
+
+    for acc_id, (acc, base) in sorted(sums.items(), key=lambda kv: kv[1][0].code):
+        if base == 0:
+            continue
+        if base > 0:
+            debit = +base
+            credit = Decimal("0")
+            total_debits += debit
+        else:
+            debit = Decimal("0")
+            credit = +(-base)
+            total_credits += credit
+
+        rows.append({
+            "code": acc.code,
+            "name": acc.name,
+            "debit": str(debit),
+            "credit": str(credit),
+        })
+
+    return {
+        "as_of": str(as_of),
+        "rows": rows,
+        "totals": {
+            "debit": str(total_debits),
+            "credit": str(total_credits),
+            "balanced": (total_debits == total_credits),
+        },
+    }
+
+def trial_balance_period(*, start: date, end: date) -> dict:
+    """
+    Period Trial Balance (a.k.a. period movement trial balance):
+    - Sums only lines within [start, end]
+    - Useful to sanity-check that period debits == period credits
+    """
+    sums = _sum_base(_iter_lines(start=start, end=end))
+    rows = []
+    total_debits = Decimal("0")
+    total_credits = Decimal("0")
+
+    for acc_id, (acc, base) in sorted(sums.items(), key=lambda kv: kv[1][0].code):
+        if base == 0:
+            continue
+        if base > 0:
+            debit = +base
+            credit = Decimal("0")
+            total_debits += debit
+        else:
+            debit = Decimal("0")
+            credit = +(-base)
+            total_credits += credit
+
+        rows.append({
+            "code": acc.code,
+            "name": acc.name,
+            "debit": str(debit),
+            "credit": str(credit),
+        })
+
+    return {
+        "period": {"start": str(start), "end": str(end)},
+        "rows": rows,
+        "totals": {
+            "debit": str(total_debits),
+            "credit": str(total_credits),
+            "balanced": (total_debits == total_credits),
         },
     }
